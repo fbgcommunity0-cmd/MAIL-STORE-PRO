@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🅐🅟 𝗧𝗘𝗖𝗛 ⚡ 𝗠𝗔𝗥𝗞𝗘𝗧 🛍️</title>
+    <title>𝑴𝑨𝑰𝑳 𝑺𝑻𝑶𝑹𝑬 𝑷𝑹𝑶 🛍️</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -309,14 +309,14 @@
     <div id="loader" class="fixed inset-0 bg-f8f8f8 flex items-center justify-center z-[100]">
         <div>
             <div class="logo-container">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mx-auto"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                 <i data-lucide="mail-check" class="text-blue-600 mx-auto w-16 h-16"></i>
             </div>
-            <h1 class="text-accent-gradient loader-text mt-4">Welcome to 🅐🅟 𝗧𝗘𝗖𝗛 ⚡ 𝗠𝗔𝗥𝗞𝗘𝗧 🛍️</h1>
+            <h1 class="text-accent-gradient loader-text mt-4">Welcome to 𝑴𝑨𝑰𝑳 𝑺𝑻𝑶𝑹𝑬 𝑷𝑹𝑶 🛍️</h1>
             <p id="loader-status-text" class="loader-subtext mt-2">Initializing your session...</p>
         </div>
     </div>
     
-    <!-- =========== NEW: CHANNEL JOIN GATE =========== -->
+    <!-- =========== NEW: CHANNEL JOIN GATE (UPDATED) =========== -->
     <div id="channel-join-gate" class="fixed inset-0 bg-f8f8f8 z-[100]">
         <div class="logo-container">
             <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 mx-auto"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72"></path></svg>
@@ -326,16 +326,24 @@
             To use our bot, you must join our official channels. This helps us prevent spam and keep you updated.
         </p>
         <div class="w-full max-w-xs space-y-3">
-            <a href="https://t.me/aptechonlineincome" target="_blank" class="btn-gradient w-full px-8 py-3 rounded-full font-bold text-lg shadow-lg flex items-center justify-center gap-2">
-                <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                <span>Join Channel 1</span>
-            </a>
-            <a href="https://t.me/gmailmarketter" target="_blank" class="btn-gradient w-full px-8 py-3 rounded-full font-bold text-lg shadow-lg flex items-center justify-center gap-2">
-                <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                <span>Join Channel 2</span>
-            </a>
+            <div class="flex items-center gap-3 w-full">
+                <a href="https://t.me/aptechonlineincome" target="_blank" class="btn-gradient flex-grow px-8 py-3 rounded-full font-bold text-lg shadow-lg flex items-center justify-center gap-2">
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    <span>Join Channel 1</span>
+                </a>
+                <span id="channel-status-0" class="text-2xl font-bold"></span>
+            </div>
+             <div class="flex items-center gap-3 w-full">
+                <a href="https://t.me/gmailmarketter" target="_blank" class="btn-gradient flex-grow px-8 py-3 rounded-full font-bold text-lg shadow-lg flex items-center justify-center gap-2">
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    <span>Join Channel 2</span>
+                </a>
+                <span id="channel-status-1" class="text-2xl font-bold"></span>
+            </div>
         </div>
-        <p class="text-xs text-gray-500">After joining, please restart the bot.</p>
+        <button id="verify-join-btn" class="btn-gradient w-full max-w-xs px-8 py-3 rounded-full font-bold text-lg shadow-lg mt-6">
+            COMPLETE JOIN
+        </button>
     </div>
 
 
@@ -348,7 +356,7 @@
         <nav id="support-channels-list" class="flex-grow overflow-y-auto">
             </nav>
         <div class="p-4 text-center text-xs text-gray-400 border-t">
-            🅐🅟 𝗧𝗘𝗖𝗛 ⚡ 𝗠𝗔𝗥𝗞𝗘𝗧 🛍️ &copy; 2026
+            𝑴𝑨𝑰𝑳 𝑺𝑻𝑶𝑹𝑬 𝑷𝑹𝑶 🛍️ &copy; 2026
         </div>
     </aside>
     <div id="app-container" class="min-h-screen flex-col main-page">
@@ -609,7 +617,7 @@
                         <p class="text-sm text-gray-500 mt-2 mb-4">যারা বেশি পরিমাণে মেইল কেনেন তাদের জন্য।</p>
                          <ul class="space-y-2 text-sm">
                             <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>প্রতি মেইলে <span id="business-discount-text" class="font-bold text-purple-600"></span> ছাড়।</li>
-                            <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>একবারে ১-স্টক পর্যন্ত মেইল কেনার সুবিধা।</li>
+                            <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>একবারে একাধিক মেইল কেনার সুবিধা।</li>
                             <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>এক ক্লিকে সব হিস্ট্রি কপি করার সুবিধা।</li>
                             <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-500"></i>আপনার মোট সাশ্রয় ট্র্যাক করুন।</li>
                         </ul>
@@ -944,6 +952,22 @@
              lucide.createIcons();
              initializeAppLogic(); // Automatically start the app
         };
+
+        async function initializeAppLogicAfterGate() {
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+            loaderStatusText.textContent = 'Loading your profile...';
+            
+            setupEventListeners();
+            setupBanner();
+
+            await initUserSession();
+
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
         
         async function initializeAppLogic() {
             try {
@@ -961,25 +985,19 @@
                 currentUserTg = { id: '6954647230', first_name: 'Test', last_name: 'User', username: 'testuser' };
             }
 
-            // --- NEW: Channel Membership Check ---
+            setupEventListeners(); // Setup listeners early for the verify button
+            
             loaderStatusText.textContent = 'Verifying your access...';
-            const isMember = await checkChannelMembership();
+            const isMember = await updateAndCheckChannelStatus();
+
             if (!isMember) {
                 loader.style.display = 'none';
                 channelGate.style.display = 'flex';
+                lucide.createIcons();
                 return; // Stop initialization
             }
             
-            loaderStatusText.textContent = 'Loading your profile...';
-            setupEventListeners();
-            setupBanner();
-
-            await initUserSession();
-
-            loader.style.opacity = '0';
-            setTimeout(() => {
-                loader.style.display = 'none';
-            }, 500);
+            await initializeAppLogicAfterGate();
         }
 
         // --- NEW: Function to check channel membership ---
@@ -1008,16 +1026,25 @@
             }
         }
 
-        async function checkChannelMembership() {
-            // For local testing, bypass the check.
-            if (currentUserTg.id === '6954647230') {
-                 console.log("Bypassing channel check for test user.");
-                 return true;
-            }
+        async function updateAndCheckChannelStatus() {
+            let allJoined = true;
+            const statusPromises = OFFICIAL_CHANNELS.map(async (channel, index) => {
+                const statusEl = document.getElementById(`channel-status-${index}`);
+                
+                // Bypass for admin/test user
+                if (currentUserTg.id === '6954647230') {
+                   if (statusEl) statusEl.textContent = '✅';
+                   return true;
+                }
 
-            const membershipChecks = OFFICIAL_CHANNELS.map(channel => getChatMember(channel));
-            const results = await Promise.all(membershipChecks);
-            return results.every(isMember => isMember); // Must be a member of ALL channels
+                const isMember = await getChatMember(channel);
+                if (statusEl) statusEl.textContent = isMember ? '✅' : '❌';
+                if (!isMember) allJoined = false;
+                
+                return isMember;
+            });
+            await Promise.all(statusPromises);
+            return allJoined;
         }
 
 
@@ -1315,6 +1342,27 @@
             document.getElementById('personal-mode-btn').addEventListener('click', () => handleProfileSwitch('personal'));
             document.getElementById('business-mode-btn').addEventListener('click', () => handleProfileSwitch('business'));
             document.getElementById('close-bulk-purchase-modal').addEventListener('click', () => document.getElementById('bulk-purchase-success-modal').classList.add('hidden'));
+
+            // Listener for the new verify button
+            const verifyBtn = document.getElementById('verify-join-btn');
+            if (verifyBtn) {
+                verifyBtn.addEventListener('click', async () => {
+                    const originalText = verifyBtn.innerHTML;
+                    verifyBtn.innerHTML = `<div class="premium-loader-spinner !w-6 !h-6 mx-auto" style="background: conic-gradient(#0000 10%, #ffffff);"></div>`;
+                    verifyBtn.disabled = true;
+
+                    const allJoined = await updateAndCheckChannelStatus();
+                    
+                    if (allJoined) {
+                        channelGate.style.display = 'none';
+                        await initializeAppLogicAfterGate();
+                    } else {
+                        showAlert("Please join all required channels to continue.");
+                        verifyBtn.innerHTML = originalText;
+                        verifyBtn.disabled = false;
+                    }
+                });
+            }
         }
 
         function adjustMailViewContainerHeight() {
@@ -2284,7 +2332,7 @@
             document.getElementById('report-purchase-cost').value = cost;
             document.getElementById('report-purchase-saleId').value = saleId;
             document.getElementById('report-issue-form').reset();
-            document.getElementById('report-issue-modal').classList.add('hidden');
+            document.getElementById('report-issue-modal').classList.remove('hidden');
         }
 
         async function handleReportSubmit(event) {
