@@ -90,10 +90,11 @@
              align-items: center;
              padding: 12px 16px;
              z-index: 50;
+             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
         }
         .nav-link-premium { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #6b7280; font-size: 0.75rem; font-weight: 500; padding: 8px; border-radius: 12px; transition: all 0.2s ease; position: relative; cursor: pointer; background: none; border: none; }
         .nav-link-premium:hover { color: #333333; }
-        .nav-link-premium.active { color: #007bff; }
+        .nav-link-premium.active { color: #007bff; font-weight: 700; }
         .nav-link-premium .icon { width: 24px; height: 24px; }
         .center-home-link { position: relative; transform: translateY(-20px) scale(1.1); background: rgba(0, 123, 255, 0.2); border: 1px solid rgba(0, 123, 255, 0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(0, 123, 255, 0.4); transition: all 0.3s ease; color: #ffffff; }
         .center-home-link:hover { transform: translateY(-20px) scale(1.15); }
@@ -539,6 +540,18 @@
                 </div>
             </div>
             <!-- =========== END OF UPDATED UPDATES PAGE =========== -->
+            
+             <!-- =========== NEW FULLSCREEN NOTIFICATION PAGE =========== -->
+            <div id="notification-page" class="p-4 space-y-6 sub-page">
+                <div class="relative flex items-center justify-center">
+                    <button onclick="navigateTo('home-page')" class="absolute left-0 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <i data-lucide="arrow-left" class="w-6 h-6 text-gray-700"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-center text-gray-800">Notifications</h2>
+                </div>
+                <div id="notification-list" class="space-y-3"></div>
+            </div>
+            <!-- =========== END OF NOTIFICATION PAGE =========== -->
 
 
             <div id="tutorial-page" class="p-4 space-y-6 sub-page">
@@ -663,22 +676,6 @@
                 </div>
             </div>
 
-            <div id="admin-page" class="p-4 space-y-6 sub-page">
-                <h2 class="text-xl font-bold text-center text-gray-800">Admin Panel</h2>
-                <div class="card-bg p-5 rounded-xl space-y-4">
-                    <h3 class="font-semibold text-lg text-gray-800">Add New Mails</h3>
-                    <p class="text-sm text-gray-600">ফরম্যাট: <code class="bg-gray-100 p-1 rounded text-gray-700">email|password|refresh_token|client_id</code></p>
-                    <div><label for="mail-type-select" class="block text-sm font-medium text-gray-600 mb-1">Mail Type</label><select id="mail-type-select" class="w-full p-3 rounded-lg input-field"></select></div>
-                    <div><label for="mail-data-textarea" class="block text-sm font-medium text-gray-600 mb-1">Mail Data (one per line)</label><textarea id="mail-data-textarea" rows="10" placeholder="mail@example.com|password|refresh_token|client_id" class="w-full p-3 rounded-lg input-field font-mono text-xs"></textarea></div>
-                    <button id="add-mails-btn" class="w-full p-3 rounded-lg btn-gradient">Add Mails to Stock</button>
-                </div>
-
-                <div class="mt-8">
-                    <h3 class="text-lg font-semibold mb-3 text-center">Replace Requests</h3>
-                    <div id="replace-requests-list" class="space-y-3"></div>
-                </div>
-            </div>
-
             <div id="link-team-page" class="p-4 space-y-6 sub-page">
                 <div class="relative flex items-center justify-center mb-4">
                     <button onclick="navigateTo('features-page')" class="absolute left-0 p-2 rounded-full hover:bg-gray-100 transition-colors">
@@ -742,7 +739,6 @@
             <a href="#" class="nav-link-premium center-home-link active" data-page="home-page"><i data-lucide="home" class="icon"></i></a>
             <a href="#" class="nav-link-premium" data-page="mail-page"><i data-lucide="mail" class="icon"></i><span>Mail</span></a>
             <a href="#" class="nav-link-premium" data-page="profile-page"><i data-lucide="user" class="icon"></i><span>Profile</span></a>
-            <a href="#" id="admin-nav-link" class="nav-link-premium hidden" data-page="admin-page"><i data-lucide="shield" class="icon"></i><span>Admin</span></a>
         </nav>
     </div>
 
@@ -753,16 +749,6 @@
             <button id="alert-ok-btn" class="btn-gradient px-8 py-2 rounded-lg">OK</button>
         </div>
     </div>
-
-    <div id="notification-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[70] p-4 backdrop-blur-sm">
-        <div class="card-bg rounded-2xl p-6 w-full max-w-sm space-y-4">
-            <h3 class="text-xl font-bold text-center text-accent-gradient mb-4">Notifications</h3>
-            <div id="notification-list" class="space-y-3 max-h-80 overflow-y-auto">
-                </div>
-            <button id="notification-ok-btn" class="w-full p-3 rounded-lg btn-gradient mt-4">Close</button>
-        </div>
-    </div>
-
 
     <div id="deposit-details-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[70] p-4 backdrop-blur-sm">
         <div class="card-bg rounded-2xl p-6 w-full max-w-sm space-y-4">
@@ -1006,12 +992,6 @@
             const url = `https://api.telegram.org/bot${BOT_TOKEN}/getChatMember?chat_id=${channelId}&user_id=${userId}`;
             
             try {
-                // IMPORTANT SECURITY NOTE:
-                // This client-side API call exposes your BOT_TOKEN.
-                // For a production app, this check should be done on a server (e.g., a Cloud Function)
-                // where the token is kept secret. The web app would then call your server endpoint.
-                // This implementation is for demonstration based on the request constraints.
-                
                 const response = await fetch(url);
                 const data = await response.json();
                 
@@ -1118,10 +1098,6 @@
             await fetchAppConfig(); // Fetch config before checking business mode status
             await checkBusinessModeStatus();
             currentProfileMode = userData.profileMode || 'personal';
-
-            if (tgChatId === ADMIN_UID) {
-                document.getElementById('admin-nav-link').classList.remove('hidden');
-            }
 
             loadSupportMenu();
             updateUI();
@@ -1278,7 +1254,7 @@
                 'pay-page': loadPaymentHistory,
                 'mail-page': loadMailStore,
                 'updates-page': () => { loadUpdates(); loadReviews(); },
-                'admin-page': () => { populateAdminMailTypes(); loadReplaceRequests(); },
+                'notification-page': loadNotificationsPage,
                 'profile-page': loadProfilePage,
                 'bot-setting-page': updateBotSettingUI,
                 'features-page': loadFeaturesPage,
@@ -1301,11 +1277,9 @@
         function setupEventListeners() {
             document.querySelectorAll('.nav-link-premium[data-page]').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); navigateTo(link.dataset.page); }));
             document.getElementById('header-deposit-btn').addEventListener('click', () => navigateTo('pay-page'));
-            document.getElementById('notification-btn').addEventListener('click', showNotifications);
-            document.getElementById('notification-ok-btn').addEventListener('click', hideNotifications);
+            document.getElementById('notification-btn').addEventListener('click', () => navigateTo('notification-page'));
             document.getElementById('deposit-btn').addEventListener('click', handleDepositRequest);
             document.getElementById('home-deposit-btn').addEventListener('click', () => navigateTo('pay-page'));
-            document.getElementById('add-mails-btn').addEventListener('click', handleAddMails);
             document.getElementById('download-history-btn').addEventListener('click', handleDownloadHistory);
             document.getElementById('copy-history-btn').addEventListener('click', handleCopyHistory);
             document.getElementById('copy-all-history-btn').addEventListener('click', handleCopyAllHistory);
@@ -1427,11 +1401,9 @@
             });
         }
 
-        async function showNotifications() {
-            const modal = document.getElementById('notification-modal');
+        async function loadNotificationsPage() {
             const listEl = document.getElementById('notification-list');
             listEl.innerHTML = getLoadingHTML();
-            modal.classList.remove('hidden');
 
             const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"), limit(20));
             const snapshot = await getDocs(q);
@@ -1444,21 +1416,19 @@
             if (filteredDocs.length === 0) {
                 listEl.innerHTML = '<p class="text-center text-gray-500">No notifications yet.</p>';
             } else {
-                listEl.innerHTML = filteredDocs.slice(0, 10).map(doc => {
+                listEl.innerHTML = filteredDocs.map(doc => {
                     const item = doc.data();
                     const date = item.createdAt.toDate().toLocaleString('en-GB');
-                    return `<div class="p-3 bg-gray-50 rounded-lg">
+                    return `<div class="p-4 bg-white rounded-lg shadow-sm border">
                         <p class="font-bold text-gray-800">${item.title}</p>
-                        <p class="text-sm text-gray-600">${item.message}</p>
-                        <p class="text-xs text-gray-400 text-right mt-2">${date}</p>
+                        <p class="text-sm text-gray-600 mt-1">${item.message}</p>
+                        <p class="text-xs text-gray-400 text-right mt-3">${date}</p>
                     </div>`;
                 }).join('');
             }
-        }
-
-
-        async function hideNotifications() {
-            document.getElementById('notification-modal').classList.add('hidden');
+            lucide.createIcons();
+            
+            // Mark as seen
             const userRef = doc(db, "users", userData.tgChatId);
             const newTimestamp = Timestamp.now();
             await updateDoc(userRef, { lastSeenNotification: newTimestamp });
@@ -2037,44 +2007,6 @@
                 console.error("Error loading updates:", e);
             }
         }
-        
-        function populateAdminMailTypes() {
-            const selectEl = document.getElementById('mail-type-select');
-            selectEl.innerHTML = '<option value="">Select mail type...</option>';
-            (appConfig.mails || []).forEach(mail => { selectEl.innerHTML += `<option value="${mail.stockKey}">${mail.type}</option>`; });
-        }
-
-        async function handleAddMails() {
-            const stockKey = document.getElementById('mail-type-select').value;
-            const mailDataRaw = document.getElementById('mail-data-textarea').value;
-            if (!stockKey || !mailDataRaw.trim()) return showAlert("Please select a mail type and provide mail data.");
-            const lines = mailDataRaw.trim().split('\n').filter(line => line.trim() !== '');
-            if (lines.length === 0) return showAlert("No valid mail data found.");
-
-            document.getElementById('app-container').append(loader);
-            loader.style.display = 'flex';
-            try {
-                const batch = writeBatch(db);
-                let addedCount = 0;
-                lines.forEach(line => {
-                    const parts = line.trim().split('|');
-                    if (parts.length >= 2) { 
-                        batch.set(doc(collection(db, stockKey)), { 
-                            email: parts[0], password: parts[1], 
-                            refresh_token: parts[2] || null, client_id: parts[3] || null, 
-                            isSold: false, createdAt: serverTimestamp() 
-                        });
-                        addedCount++;
-                    }
-                });
-                if (addedCount > 0) {
-                    await batch.commit();
-                    showAlert(`Successfully added ${addedCount} new mails.`);
-                    document.getElementById('mail-data-textarea').value = '';
-                } else showAlert("No valid mails found to add.");
-            } catch (error) { showAlert("An error occurred while adding mails."); }
-            finally { loader.style.display = 'none'; }
-        }
 
         function showAlert(message) {
             document.getElementById('alert-message').innerText = message;
@@ -2372,106 +2304,6 @@
                 loadMailStore();
             } catch (e) {
                 showAlert(`একটি সমস্যা হয়েছে: ${e.message}`);
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-        
-        async function loadReplaceRequests() {
-            const listEl = document.getElementById('replace-requests-list');
-            listEl.innerHTML = getLoadingHTML();
-            try {
-                const q = query(collection(db, "replace_requests"), where("status", "==", "pending"), orderBy("requestedAt", "desc"));
-                const snapshot = await getDocs(q);
-                if (snapshot.empty) return listEl.innerHTML = '<p class="text-center text-gray-500">No pending requests.</p>';
-
-                listEl.innerHTML = snapshot.docs.map(doc => {
-                    const req = { id: doc.id, ...doc.data() };
-                    const date = req.requestedAt.toDate().toLocaleString('en-GB');
-                    return `<div class="card-bg p-4 rounded-lg space-y-3">
-                        <div class="flex justify-between items-center">
-                            <h4 class="font-bold text-gray-800">${req.userName} (${req.userId})</h4>
-                            <span class="text-xs text-gray-500">${date}</span>
-                        </div>
-                        <p class="text-sm font-semibold">Mail: ${req.mailType}</p>
-                        <p class="text-sm"><strong>Reason:</strong> ${req.reason}</p>
-                        ${req.proof ? `<p class="text-sm"><strong>Proof:</strong> <a href="${req.proof}" target="_blank" class="text-blue-600 hover:underline">View Proof</a></p>` : ''}
-                        <div class="flex justify-end gap-2 pt-2 border-t">
-                            <button onclick="handleRejectRequest('${req.id}', '${req.userId}')" class="px-3 py-1 text-sm font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600">Reject</button>
-                            <button onclick="handleApproveRequest('${req.id}', '${req.userId}', ${req.cost}, '${req.purchaseId}')" class="px-3 py-1 text-sm font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600">Approve (Refund ৳${req.cost})</button>
-                        </div>
-                    </div>`;
-                }).join('');
-            } catch (e) {
-                listEl.innerHTML = '<p class="text-center text-red-600">Failed to load requests.</p>';
-            }
-        }
-
-        window.handleApproveRequest = async (requestId, userId, cost, purchaseId) => {
-            if (!confirm(`Are you sure you want to approve this request and refund ৳${cost} to user ${userId}?`)) return;
-            document.getElementById('app-container').append(loader);
-            loader.style.display = 'flex';
-            try {
-                await runTransaction(db, async (transaction) => {
-                    const requestRef = doc(db, "replace_requests", requestId);
-                    const userRef = doc(db, "users", userId);
-                    const purchaseRef = doc(db, "mail_purchases", purchaseId);
-
-                    const userDoc = await transaction.get(userRef);
-                    if (!userDoc.exists()) throw new Error("User not found.");
-
-                    transaction.update(requestRef, { status: 'approved', resolvedAt: serverTimestamp() });
-                    transaction.update(userRef, { balance: increment(cost) });
-                    transaction.update(purchaseRef, { isRefunded: true });
-                });
-                showAlert("Request approved and balance refunded successfully.");
-                loadReplaceRequests();
-            } catch(e) {
-                showAlert(`Failed to approve request: ${e.message}`);
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-        
-        window.handleRejectRequest = async (requestId, userId) => {
-            if (!confirm("Are you sure you want to reject this request? This may trigger a penalty for the user.")) return;
-            document.getElementById('app-container').append(loader);
-            loader.style.display = 'flex';
-            try {
-                const userRef = doc(db, "users", userId);
-                const requestRef = doc(db, "replace_requests", requestId);
-
-                await runTransaction(db, async (transaction) => {
-                    const userSnap = await transaction.get(userRef);
-                    if (!userSnap.exists()) throw new Error("User not found");
-                    const userData = userSnap.data();
-
-                    const today = new Date().toISOString().slice(0, 10);
-                    let dailyRejections = userData.dailyRejections || { date: today, count: 0 };
-
-                    if (dailyRejections.date !== today) {
-                        dailyRejections = { date: today, count: 1 };
-                    } else {
-                        dailyRejections.count += 1;
-                    }
-
-                    const updates = {
-                        "dailyRejections": dailyRejections
-                    };
-
-                    if (dailyRejections.count >= 5) {
-                        updates.isBlocked = true;
-                        updates.blockedUntil = Timestamp.fromMillis(Date.now() + 5 * 60 * 60 * 1000);
-                    }
-                    
-                    transaction.update(userRef, updates);
-                    transaction.update(requestRef, { status: 'rejected', resolvedAt: serverTimestamp() });
-                });
-
-                showAlert("Request has been rejected. User's rejection count updated.");
-                loadReplaceRequests();
-            } catch(e) {
-                showAlert(`Failed to reject request: ${e.message}`);
             } finally {
                 loader.style.display = 'none';
             }
