@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
     <title>𝑴𝑨𝑰𝑳 𝑺𝑻𝑶𝑹𝑬 𝑷𝑹𝑶 🛍️</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -418,6 +418,17 @@
                     <h3 id="profile-name" class="text-2xl font-bold text-gray-800">Loading...</h3>
                     <p id="profile-username" class="text-gray-500">@username</p>
                     <p id="profile-id" class="text-sm text-gray-600 mt-2 selectable-text">ID: 123456</p>
+                </div>
+
+                <div class="bg-white border border-slate-200 p-6 rounded-2xl text-center shadow-sm">
+                    <h3 class="font-bold text-lg text-gray-800 flex items-center justify-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-6 h-6 text-blue-600"></i>
+                        Bot Statistics
+                    </h3>
+                    <div class="mt-4">
+                        <p class="text-sm text-gray-500">Total Users</p>
+                        <p id="total-users-display" class="text-4xl font-bold text-accent-gradient mt-1">0</p>
+                    </div>
                 </div>
 
                 <div class="space-y-3">
@@ -1207,8 +1218,37 @@
             userData.lastSeenNotification = newTimestamp;
             document.getElementById('notification-badge').classList.add('hidden');
         }
+        
+        async function getTotalUserCount() {
+            try {
+                const coll = collection(db, "users");
+                const snapshot = await getCountFromServer(coll);
+                return snapshot.data().count;
+            } catch (error) {
+                console.error("Error getting total user count:", error);
+                return 0; // Return 0 on error
+            }
+        }
 
-        function loadProfilePage() {
+        function animateCountUp(targetEl, end, duration) {
+            let start = 0;
+            const range = end - start;
+            let current = start;
+            const increment = end > start ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / range));
+            
+            const timer = setInterval(() => {
+                const step = Math.ceil(range / (duration / 15));
+                current += step;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                targetEl.innerText = current.toLocaleString();
+            }, 15);
+        }
+
+        async function loadProfilePage() {
             if (currentUserTg) {
                  if (userData.photo_url) {
                     document.getElementById('profile-pic').src = userData.photo_url;
@@ -1224,6 +1264,15 @@
                 document.getElementById('profile-name').textContent = `${currentUserTg.first_name} ${currentUserTg.last_name || ''}`.trim();
                 document.getElementById('profile-username').textContent = currentUserTg.username ? `@${currentUserTg.username}` : 'No Telegram Username';
                 document.getElementById('profile-id').textContent = `Telegram ID: ${currentUserTg.id}`;
+            }
+
+            const totalUsersDisplay = document.getElementById('total-users-display');
+            try {
+                const userCount = await getTotalUserCount();
+                const displayCount = userCount * 30;
+                animateCountUp(totalUsersDisplay, displayCount, 2000); // Animate over 2 seconds
+            } catch (e) {
+                totalUsersDisplay.innerText = 'N/A';
             }
         }
 
@@ -1318,16 +1367,18 @@
                 const encodedDetails = encodeURIComponent(mail.details || '');
                 const encodedFeatures = encodeURIComponent(JSON.stringify(mail.featureList || []));
 
-                const personalBuyButton = `<button class="${buyButtonDisabled ? 'bg-gray-400 cursor-not-allowed text-white font-semibold' : 'btn-primary'} w-full py-2.5 rounded-lg text-md" ${buyButtonDisabled ? 'disabled' : ''} onclick="buyMail('${mail.type}', ${mail.priceBdt}, '${mail.stockKey}')">Buy Now</button>`;
+                const personalBuyButton = `<button class="${buyButtonDisabled ? 'bg-gray-400 cursor-not-allowed text-white font-semibold' : 'btn-primary'} w-full py-2.5 rounded-lg text-md" ${buyButtonDisabled ? 'disabled' : ''} onclick="buyMail('${mail.type}', ${mail.priceBdt}, '${mail.stockKey}')">${isOutOfStock ? 'Stock Out' : 'Buy Now'}</button>`;
                 
-                const businessBuySection = `
+                const businessBuySection = isOutOfStock 
+                ? `<button class="w-full py-2.5 rounded-lg text-md bg-red-400 cursor-not-allowed text-white font-semibold" disabled>Stock Out</button>`
+                : `
                     <div class="flex items-center gap-2">
                         <div class="flex-grow flex items-center border border-gray-300 rounded-lg">
                             <button onclick="updateQty('${mail.stockKey}', -1, ${mail.stock})" class="px-3 py-2 text-gray-600 hover:bg-slate-100 rounded-l-lg">-</button>
                             <input id="qty-${mail.stockKey}" type="number" min="1" max="${mail.stock}" value="1" class="w-full text-center font-bold border-l border-r bg-white" onchange="validateQty(this, ${mail.stock})">
                             <button onclick="updateQty('${mail.stockKey}', 1, ${mail.stock})" class="px-3 py-2 text-gray-600 hover:bg-slate-100 rounded-r-lg">+</button>
                         </div>
-                        <button class="btn-primary w-auto px-6 py-2.5 text-md flex-shrink-0" ${isOutOfStock ? 'disabled' : ''} onclick="handleBulkBuy('${mail.type}', ${mail.priceBdt}, '${mail.stockKey}', ${mail.stock})">Buy</button>
+                        <button class="btn-primary w-auto px-6 py-2.5 text-md flex-shrink-0" onclick="handleBulkBuy('${mail.type}', ${mail.priceBdt}, '${mail.stockKey}', ${mail.stock})">Buy</button>
                     </div>
                 `;
 
@@ -1346,7 +1397,7 @@
                     <div class="grid grid-cols-3 text-center items-center pt-2 border-t border-slate-200">
                         <div class="py-2">${apiButtonHtml}</div>
                         <div class="py-2"><p class="text-gray-500 text-sm">Price</p><p class="font-bold text-lg text-blue-600">৳${displayPrice.toFixed(2)}</p></div>
-                        <div class="py-2"><p class="text-gray-500 text-sm">Stock</p><p class="font-bold text-lg text-green-600">${mail.stock}</p></div>
+                        <div class="py-2"><p class="text-gray-500 text-sm">Stock</p><p class="font-bold text-lg text-green-600">${mail.stock * 15}</p></div>
                     </div>
                     ${currentProfileMode === 'business' ? businessBuySection : personalBuyButton}
                 </div>`;
